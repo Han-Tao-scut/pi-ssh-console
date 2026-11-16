@@ -1,8 +1,8 @@
-# pi-ssh
+# pi-ssh-console
 
-SSH client extension for the [pi coding agent](https://github.com/earendil-works/pi).
+SSH client extension for the [pi coding agent](https://github.com/earendil-works/pi), with a live overview of configured hosts, CPU/memory use, and running tunnels.
 
-Run commands on remote hosts, move files over SFTP, and turn a password login into a key login — all from a pi session.
+`pi-ssh-console` is a fork of [`pi-ssh`](https://github.com/patimweb-agents/pi-ssh). The SSH tools, `/ssh` commands and skills are unchanged. The product change is the widget and footer summary: it now shows the configured hosts, their resolved addresses, TCP reachability and Linux CPU/memory readings, alongside the existing tunnel list.
 
 **Nothing has to be installed.** No `ssh`, no `ssh-keygen`, no `ssh-copy-id`. The SSH protocol comes from [ssh2](https://github.com/mscdex/ssh2), a pure JavaScript implementation, and keys are generated with Node's own crypto. Windows, macOS and Linux behave identically.
 
@@ -10,11 +10,40 @@ Run commands on remote hosts, move files over SFTP, and turn a password login in
 
 ```bash
 # Install from npm
-pi install npm:@patimweb/pi-ssh
+pi install npm:pi-ssh-console
 
 # Install from local path during development
-pi install /path/to/pi-ssh
+pi install /path/to/pi-ssh-console
 ```
+
+`pi-ssh-console` replaces `pi-ssh`. Do not keep both loaded for the same session: they register the same tool and command names. To switch an existing installation:
+
+```bash
+pi remove npm:@patimweb/pi-ssh
+pi install npm:pi-ssh-console
+```
+
+## Host overview
+
+The extension displays one `pi-ssh` widget above the editor. Click it in Pi Web, or expand it in the terminal, to see every configured profile. The active profile is marked with `▸` and highlighted.
+
+```text
+SSH  ● 3/4 up  active seoul  updated 14:32:05
+────────────────────────────────────────────────────────────
+● ▸ seoul          deploy@10.126.126.3:22      up 1 ms  key
+    8 threads · 15.5 GiB RAM · CPU 23% · MEM 41%
+●   DnaShenzhen    dna-storage@10.126.126.4:22  up 2 ms  key
+    32 threads · 62.7 GiB RAM · CPU 8% · MEM 64%
+●   aliyun-wuhan   deploy@10.126.126.8:22      up 3 ms  key
+    2 threads · 1.7 GiB RAM · CPU 2% · MEM 34%
+○   pz             deploy@172.19.199.3:22      timeout  key
+
+Tunnels  ● 1 open
+────────────────────────────────────────────────────────────
+● staging/db  127.0.0.1:5432 → db.internal:5432  3 conns
+```
+
+Pi Web and the terminal render ANSI styling: reachable hosts are green, failures are red, checking hosts are yellow, and secondary metadata is dim. CPU and memory percentages are green below 70%, yellow from 70% to 89%, and red at 90% or above. The latency is a DNS lookup followed by a TCP connection to the configured SSH port; it does not authenticate. The CPU/memory line is a separate authenticated SSH command. It reads two `/proc/stat` samples one second apart, `/proc/meminfo`, and the logical CPU count. It does not run auto-key, so a passive refresh never replaces a password with a key. It follows the profile's normal host-key policy and is Linux-only; other systems show `metrics unavailable: unsupported`. The display refreshes when a tool call finishes and every 30 seconds while the session is open.
 
 ## Quick Start
 
@@ -208,8 +237,10 @@ The stored form is plain JSON, so it can be written by hand too:
 An open tunnel is shown in pi itself, not only when you ask for it. Each one appears in the widget above the editor:
 
 ```
-SSH tunnel staging/db: 127.0.0.1:5432 -> db.internal:5432
-SSH tunnel staging/preview: 127.0.0.1:8080 <- 127.0.0.1:3000 until 11:30Z
+Tunnels  ● 2 open
+────────────────────────────────────────────────────────────
+● staging/db       127.0.0.1:5432  → db.internal:5432       3 conns
+● staging/preview  127.0.0.1:8080  ← 127.0.0.1:3000         until 11:30Z
 ```
 
 and the footer carries a short summary (`SSH tunnel db on 127.0.0.1:5432`, or `2 SSH tunnels open`). Both are cleared the moment the last tunnel closes, so nothing claims a forward is open when it is not.
@@ -303,7 +334,9 @@ Writes are atomic: the new contents go to a private temporary file that is renam
 
 ## Platform support
 
-Windows, macOS and Linux behave the same. Nothing in this package spawns a process — SSH comes from [ssh2](https://github.com/mscdex/ssh2) in pure JavaScript, keys are generated with Node's crypto, and there are no POSIX-only paths. A test asserts all three, so a change that introduces one fails the suite rather than only failing on someone else's machine.
+The SSH tools, tunnels and file transfer work on Windows, macOS and Linux. Nothing in this package spawns a process — SSH comes from [ssh2](https://github.com/mscdex/ssh2) in pure JavaScript, keys are generated with Node's crypto, and there are no POSIX-only paths. A test asserts all three, so a change that introduces one fails the suite rather than only failing on someone else's machine.
+
+The CPU/memory widget is the exception: it currently reads Linux `/proc` and `nproc` data. Other remote systems still show reachability but report `metrics unavailable: unsupported`.
 
 One difference is real and worth knowing: **file permissions are not enforced on Windows.** The config file and private keys are written with mode `0600`, but Windows governs access through ACLs and `chmod` only toggles the read-only bit. `ssh_doctor` reports this as a note on Windows rather than staying quiet about it. The practical answer is the same as everywhere: let the first connection replace the stored password with a key, so the file stops holding a secret at all.
 

@@ -28,6 +28,7 @@ import { startTestServer, type TestServer } from "./sshd.ts";
 let server: TestServer | null = null;
 let workspace: string;
 let knownHosts: string;
+let originalHome: string | undefined;
 
 function profileFor(overrides: Partial<SshProfile> = {}): SshProfile {
   return {
@@ -45,9 +46,15 @@ before(async () => {
   server = await startTestServer();
   workspace = fs.mkdtempSync(path.join(os.tmpdir(), "pi-ssh-work-"));
   knownHosts = path.join(workspace, "known_hosts");
+
+  // Keep config writes from this file away from the user's real ~/.pi.
+  originalHome = process.env.HOME;
+  process.env.HOME = workspace;
+  fs.mkdirSync(path.join(workspace, ".pi"), { recursive: true, mode: 0o700 });
 });
 
 after(() => {
+  process.env.HOME = originalHome;
   server?.stop();
   if (workspace) fs.rmSync(workspace, { recursive: true, force: true });
 });
@@ -214,12 +221,6 @@ describe("file transfer", () => {
 });
 
 describe("key bootstrap", () => {
-  const originalHome = process.env.HOME;
-
-  after(() => {
-    process.env.HOME = originalHome;
-  });
-
   it("generates a key, installs it, and proves a key-only login works", async (t) => {
     if (!server) return t.skip("no sshd on this machine");
 

@@ -1,27 +1,29 @@
 {
-  "name": "@patimweb/pi-ssh",
-  "version": "1.3.3",
-  "description": "SSH client extension for the pi coding agent. Run commands, transfer files over SFTP, and set up key-based login on remote hosts.",
+  "name": "pi-ssh-console",
+  "version": "1.0.0",
+  "description": "SSH client extension for pi with live host reachability, Linux CPU/memory use and tunnel overviews. Tools, commands and skills remain compatible with pi-ssh.",
   "keywords": [
     "pi-package",
     "pi-extension",
     "ssh",
     "sftp",
     "remote",
-    "ssh2"
+    "ssh2",
+    "pi-ssh-console"
   ],
-  "author": "Patrick Weppelmann",
+  "author": "littlepenguin",
+  "contributors": [
+    "Patrick Weppelmann"
+  ],
   "license": "MIT",
+  "files": [
+    "index.ts",
+    "src",
+    "skills"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22.19.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/patimweb-agents/pi-ssh.git"
-  },
-  "bugs": {
-    "url": "https://github.com/patimweb-agents/pi-ssh/issues"
   },
   "scripts": {
     "build": "echo 'No build step defined'",

@@ -1,10 +1,7 @@
+# Automatic publishing is disabled while npm releases are manual.
 name: Release
 
 on:
-  push:
-    branches:
-      - main
-      - next
   workflow_dispatch:
 
 permissions:

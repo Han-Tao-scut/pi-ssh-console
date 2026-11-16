@@ -2,3 +2,7 @@
 .gitignore
 .DS_Store
 tests/
+dist/
+release.config.cjs
+.node-version
+.npmrc

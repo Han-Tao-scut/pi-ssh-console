@@ -81,6 +81,16 @@ export interface SshProfiles {
 
 // Domain
 
+export interface HostResources {
+  readonly cpuThreads: number;
+  readonly cpuPercent: number;
+  readonly memoryTotalBytes: number;
+  readonly memoryUsedBytes: number;
+  readonly memoryUsedPercent: number;
+}
+
+export type HostResourceState = "loading" | "ready" | "error";
+
 export interface ExecResult {
   readonly command: string;
   readonly stdout: string;
