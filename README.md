@@ -12,8 +12,6 @@ SSH client extension for the [pi coding agent](https://github.com/earendil-works
 # Install from npm
 pi install npm:pi-ssh-console
 
-# Install from local path during development
-pi install /path/to/pi-ssh-console
 ```
 
 `pi-ssh-console` replaces `pi-ssh`. Do not keep both loaded for the same session: they register the same tool and command names. To switch an existing installation:
