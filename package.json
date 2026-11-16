@@ -15,6 +15,14 @@
   "contributors": [
     "Patrick Weppelmann"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Han-Tao-scut/pi-ssh-console.git"
+  },
+  "homepage": "https://github.com/Han-Tao-scut/pi-ssh-console#readme",
+  "bugs": {
+    "url": "https://github.com/Han-Tao-scut/pi-ssh-console/issues"
+  },
   "license": "MIT",
   "files": [
     "index.ts",
